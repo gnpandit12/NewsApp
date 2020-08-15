@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, 5000);
+        }, 3000);
 
     }
 
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }, 5000);
+                    }, 2500);
 
                 }
 

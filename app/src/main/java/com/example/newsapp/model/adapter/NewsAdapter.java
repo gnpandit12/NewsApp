@@ -1,6 +1,7 @@
 package com.example.newsapp.model.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.newsapp.R;
 import com.example.newsapp.model.pojoclass.Article;
+import com.example.newsapp.view.WebViewActivity;
 
 import java.util.List;
 
@@ -92,6 +94,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
                 }).into(holder.newsImageView);
 
         holder.descriptionTextView.setText(article.getDescription());
+
+
+        holder.itemView.setOnClickListener(view -> {
+            Log.d(TAG, "onClick: ");
+            Intent intent = new Intent(mContext, WebViewActivity.class);
+            intent.putExtra("news_url", article.getUrl());
+            mContext.startActivity(intent);
+        });
+
     }
 
 
