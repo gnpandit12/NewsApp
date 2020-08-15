@@ -48,6 +48,13 @@ public class MainViewModel extends ViewModel {
         newsLoadingMutableLiveData.setValue(true);
         newsResponseLoadingErrorMutableLiveData.setValue(false);
 
+        if ("India".equals(country)){
+            country = "in";
+        }else if ("United States".equals(country)){
+            country = "us";
+        }
+
+
         compositeDisposable.add(
                 newsAPIService.getCountrySpecificNews(country, category, apiKey)
                         .subscribeOn(Schedulers.newThread())

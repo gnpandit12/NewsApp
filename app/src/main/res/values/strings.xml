@@ -6,4 +6,7 @@
     <string name="author">Author</string>
     <string name="news_link">News Link</string>
     <string name="news_description">News Description</string>
+    <string name="get_location">Get Location</string>
+    <string name="add_icon">Add Icon</string>
+    <string name="ad">Ad</string>
 </resources>

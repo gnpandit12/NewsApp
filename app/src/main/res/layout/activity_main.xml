@@ -15,6 +15,12 @@
             android:layout_centerInParent="true"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
+        <ProgressBar
+            android:id="@+id/progress_circular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
     </RelativeLayout>
 
 </layout>

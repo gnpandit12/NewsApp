@@ -35,43 +35,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         Log.d(TAG, "NewsAdapter: ");
     }
 
-    @NonNull
-    @Override
-    public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.news_card, parent, false);
-        return new NewsViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
-
-        Article article = mArticleList.get(position);
-
-        holder.sourceTextView.setText(article.getSource().getName());
-        holder.titleTextView.setText(article.getTitle());
-        holder.authorTextView.setText(article.getAuthor());
-
-        Glide.with(mContext)
-                .load(article.getUrlToImage())
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        assert e != null;
-                        Log.d(TAG, "onLoadFailed: "+e.toString());
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        Log.d(TAG, "onResourceReady: ");
-                        return false;
-                    }
-                }).into(holder.newsImageView);
-
-        holder.descriptionTextView.setText(article.getDescription());
-
-    }
-
     @Override
     public int getItemCount() {
         return mArticleList.size();
@@ -95,6 +58,40 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
 
 
+    }
+
+    @NonNull
+    @Override
+    public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.news_card, parent, false);
+        return new NewsViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
+        Article article = mArticleList.get(position);
+        holder.sourceTextView.setText(article.getSource().getName());
+        holder.titleTextView.setText(article.getTitle());
+        holder.authorTextView.setText(article.getAuthor());
+
+        Glide.with(mContext)
+                .load(article.getUrlToImage())
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        assert e != null;
+                        Log.d(TAG, "onLoadFailed: "+e.toString());
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        Log.d(TAG, "onResourceReady: ");
+                        return false;
+                    }
+                }).into(holder.newsImageView);
+
+        holder.descriptionTextView.setText(article.getDescription());
     }
 
 

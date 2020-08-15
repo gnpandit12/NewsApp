@@ -5,29 +5,35 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.newsapp.R;
 import com.example.newsapp.model.adapter.NewsAdapter;
 import com.example.newsapp.model.constants.Constants;
 import com.example.newsapp.model.location.LocationService;
-import com.example.newsapp.model.pojoclass.Article;
-import com.example.newsapp.model.pojoclass.NewsAPIResponse;
+
 import com.example.newsapp.viewModel.MainViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,116 +47,82 @@ public class MainActivity extends AppCompatActivity {
     private NewsAdapter newsAdapter;
     private RecyclerView newsRecyclerView;
     private String country_name = "in";
+    private double currentLatitude, currentLongitude;
+    private ProgressBar circularProgressBar;
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
     LocationService locationService;
 
-    public MainActivity() {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        circularProgressBar =  findViewById(R.id.progress_circular);
+        circularProgressBar.setVisibility(View.VISIBLE);
+        try {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
-        checkLocationPermission();
         category = "business";
         apiKey = Constants.apiKey;
-
         newsRecyclerView = findViewById(R.id.news_recycler_view);
         newsRecyclerView.setHasFixedSize(true);
         Log.d(TAG, "Category: "+category);
         Log.d(TAG, "apiKey: "+apiKey);
         mMainViewModel = new MainViewModel();
 
-        locationService = new LocationService(MainActivity.this);
-        if (locationService.canGetLocation()) {
-            double longitude = locationService.getLongitude();
-            double latitude = locationService.getLatitude();
-            country_name = locationService.getCountryName(this, latitude, longitude);
-            if ("India".equals(country_name)){
-                country_name = "in";
-            }else if ("United States".equals(country_name)){
-                country_name = "us";
-            }
-            Log.d(TAG, "Country: "+country_name);
-            mMainViewModel.getCountrySpecificNews(country_name, category, apiKey);
-            observeViewModel();
-        } else {
-            locationService.showSettingsAlert();
-        }
-
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        locationService = new LocationService(MainActivity.this);
-        if (locationService.canGetLocation()) {
-            double longitude = locationService.getLongitude();
-            double latitude = locationService.getLatitude();
-            country_name = locationService.getCountryName(this, latitude, longitude);
-            if ("India".equals(country_name)){
-                country_name = "in";
-            }else if ("United States".equals(country_name)){
-                country_name = "us";
+        circularProgressBar.setVisibility(View.VISIBLE);
+        getLocation();
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            Log.d(TAG, "run: ");
+            Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1);
+                if (addresses.size() > 0) {
+                    Address address = addresses.get(0);
+                    country_name = address.getCountryName();
+                    Log.d(TAG, "Country Name: "+country_name);
+                    mMainViewModel.getCountrySpecificNews(country_name, category, apiKey);
+                    observeViewModel();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            Log.d(TAG, "Country: "+country_name);
-            mMainViewModel.getCountrySpecificNews(country_name, category, apiKey);
-            observeViewModel();
-        } else {
-            locationService.showSettingsAlert();
-        }
+        }, 5000);
+
     }
+
 
     private void observeViewModel() {
         mMainViewModel.newsAPIResponseMutableLiveData.observe(
-                this, new Observer<NewsAPIResponse>() {
-                    @Override
-                    public void onChanged(NewsAPIResponse newsAPIResponse) {
-                        Log.d(TAG, "onChanged: ");
-                        String status = newsAPIResponse.getStatus();
-                        if ("ok".equals(status)){
-                            totalResults = newsAPIResponse.getTotalResults();
-                            Log.d(TAG, "Total Results: "+totalResults);
-                            newsAdapter = new NewsAdapter(MainActivity.this, newsAPIResponse.getArticles());
-                            newsRecyclerView.setAdapter(newsAdapter);
-                            newsAdapter.notifyDataSetChanged();
-                        }else {
-                            Toast.makeText(MainActivity.this, "Status: "+status, Toast.LENGTH_SHORT).show();
-                        }
+                this, newsAPIResponse -> {
+                    circularProgressBar.setVisibility(View.GONE);
+                    Log.d(TAG, "onChanged: ");
+                    String status = newsAPIResponse.getStatus();
+                    if ("ok".equals(status)){
+                        totalResults = newsAPIResponse.getTotalResults();
+                        Log.d(TAG, "Total Results: "+totalResults);
+                        newsAdapter = new NewsAdapter(MainActivity.this, newsAPIResponse.getArticles());
+                        newsRecyclerView.setAdapter(newsAdapter);
+                        newsAdapter.notifyDataSetChanged();
+                    }else {
+                        circularProgressBar.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Status: "+status, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
-    }
-
-
-    public boolean checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        ALL_PERMISSIONS_RESULT);
-
-
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        ALL_PERMISSIONS_RESULT);
-            }
-            return false;
-        } else {
-            return true;
-        }
-
     }
 
     @Override
@@ -163,27 +135,48 @@ public class MainActivity extends AppCompatActivity {
                         ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
 
-                    //Request location updates:
-                    locationService = new LocationService(MainActivity.this);
-                    if (locationService.canGetLocation()) {
-                        double longitude = locationService.getLongitude();
-                        double latitude = locationService.getLatitude();
-                        Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
-                    } else {
-                        locationService.showSettingsAlert();
-                    }
+                    getLocation();
+                    Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        Log.d(TAG, "run: ");
+                        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1);
+                            if (addresses.size() > 0) {
+                                Address address = addresses.get(0);
+                                country_name = address.getCountryName();
+                                Log.d(TAG, "Country Name: "+country_name);
+                                mMainViewModel.getCountrySpecificNews(country_name, category, apiKey);
+                                observeViewModel();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }, 5000);
 
                 }
 
             }
+        }else {
+            Log.d(TAG, "onRequestPermissionsResult: ");
         }
     }
 
 
+    public void getLocation(){
+        locationService = new LocationService(MainActivity.this);
+        if(locationService.canGetLocation()){
+            currentLatitude = locationService.getLatitude();
+            currentLongitude = locationService.getLongitude();
+        }else{
+            locationService.showSettingsAlert();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationService.stopListener();
+        locationService.stopUsingGPS();
     }
 
 
