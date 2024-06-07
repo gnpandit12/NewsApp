@@ -35,6 +35,7 @@ public class HeadlinesRepository {
     public MutableLiveData<TopHeadlines> getTopHeadlinesResponse(
             String category,
             String language,
+            String country,
             String maxHeadlines,
             String apiKey
     ) {
@@ -42,6 +43,7 @@ public class HeadlinesRepository {
         Call<TopHeadlines> topHeadlinesCall = apiInterface.getTopHeadlines(
               category,
                 language,
+                country,
                 maxHeadlines,
                 apiKey
         );
@@ -69,6 +71,7 @@ public class HeadlinesRepository {
     public MutableLiveData<TopHeadlines> getSearchedNewsResponse(
             String searchKeyword,
             String lang,
+            String country,
             String max,
             String apikey
     ) {
@@ -76,6 +79,7 @@ public class HeadlinesRepository {
         Call<TopHeadlines> topHeadlinesCall = apiInterface.getSearchedHeadlines(
                 searchKeyword,
                 lang,
+                country,
                 max,
                 apikey
         );

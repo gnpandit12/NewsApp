@@ -19,6 +19,7 @@ import com.example.newsapp.R;
 import com.example.newsapp.databinding.FragmentBookmarkBinding;
 import com.example.newsapp.model.adapter.NewsRecyclerViewAdapter;
 import com.example.newsapp.model.data.Article;
+import com.example.newsapp.model.listener.BookmarkExitsListener;
 import com.example.newsapp.model.listener.OnBookmarkClickedListener;
 import com.example.newsapp.model.listener.OnHeadlineClickListener;
 import com.example.newsapp.view.NewsDetailsActivity;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BookmarksFragment extends Fragment implements OnHeadlineClickListener, OnBookmarkClickedListener {
+public class BookmarksFragment extends Fragment implements OnHeadlineClickListener, OnBookmarkClickedListener, BookmarkExitsListener {
 
     private FragmentBookmarkBinding fragmentBookmarkBinding;
     private BookmarkViewModel bookmarkViewModel;
@@ -65,16 +66,13 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
 
     private void getBookmarks() {
         bookmarkViewModel.getAllBookmarksList().observe(requireActivity(), articles -> {
-            if (!articles.isEmpty()) {
-                newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) articles);
-                bookmarksRecyclerView.setAdapter(newsRecyclerViewAdapter);
-                newsRecyclerViewAdapter.setOnNewsClickListener(this);
-                newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
-                progressBar.setVisibility(View.INVISIBLE);
-                newsRecyclerViewAdapter.notifyDataSetChanged();
-            } else {
-                progressBar.setVisibility(View.INVISIBLE);
-            }
+            newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) articles);
+            bookmarksRecyclerView.setAdapter(newsRecyclerViewAdapter);
+            newsRecyclerViewAdapter.setOnNewsClickListener(this);
+            newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
+            newsRecyclerViewAdapter.setBookmarkExitsListener(this);
+            progressBar.setVisibility(View.INVISIBLE);
+            newsRecyclerViewAdapter.notifyDataSetChanged();
         });
     }
 
@@ -88,5 +86,10 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
     @Override
     public void onBookmarkClicked(Article article, String title, String content, String description, ImageView bookmarkImageView) {
         bookmarkViewModel.deleteArticle(title);
+    }
+
+    @Override
+    public void isBookmarked(Article article, ImageView bookmarkImageView) {
+        bookmarkImageView.setImageResource(R.drawable.baseline_bookmark_24);
     }
 }

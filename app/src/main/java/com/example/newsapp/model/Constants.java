@@ -6,6 +6,10 @@ package com.example.newsapp.model;
  **/
 public class Constants {
 
-    public static final String API_KEY = "6e8cabf3d203b350af3614dd76c0d2ae";
+    public static final String API_KEY = "995fd10259fa49d192230a270ae64c94";
+    public static final String LANGUAGE = "en";
+    public static final String COUNTRY = "in";
+    public static final String CATEGORY = "technology";
+    public static final String MAX_HEADLINES = "10";
 
 }

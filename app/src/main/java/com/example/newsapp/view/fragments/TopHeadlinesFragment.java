@@ -23,6 +23,7 @@ import com.example.newsapp.model.Constants;
 import com.example.newsapp.model.adapter.NewsRecyclerViewAdapter;
 import com.example.newsapp.model.data.Article;
 import com.example.newsapp.model.data.TopHeadlines;
+import com.example.newsapp.model.listener.BookmarkExitsListener;
 import com.example.newsapp.model.listener.OnBookmarkClickedListener;
 import com.example.newsapp.model.listener.OnHeadlineClickListener;
 import com.example.newsapp.view.NewsDetailsActivity;
@@ -30,10 +31,11 @@ import com.example.newsapp.viewModel.BookmarkViewModel;
 import com.example.newsapp.viewModel.TopHeadlinesViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
-public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickListener, OnBookmarkClickedListener {
+public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickListener, OnBookmarkClickedListener, BookmarkExitsListener {
 
     private FragmentTopHeadlinesBinding fragmentTopHeadlinesBinding;
     private TopHeadlinesViewModel topHeadlinesViewModel;
@@ -76,8 +78,9 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
                 if (!searchEditText.getText().toString().trim().isEmpty()) {
                     getSearchedNews(
                             searchEditText.getText().toString().trim(),
-                            "en",
-                            "10",
+                            Constants.LANGUAGE,
+                            Constants.COUNTRY,
+                            Constants.MAX_HEADLINES,
                             Constants.API_KEY
                     );
                 } else {
@@ -88,19 +91,30 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
         });
 
         progressBar.setVisibility(View.VISIBLE);
+        getNews();
+    }
+
+    private void getNews() {
         if (!searchEditText.getText().toString().trim().isEmpty()) {
             getSearchedNews(
                     searchEditText.getText().toString().trim(),
-                    "en",
-                    "10",
+                    Constants.LANGUAGE,
+                    Constants.COUNTRY,
+                    Constants.MAX_HEADLINES,
                     Constants.API_KEY
             );
         } else {
-            getTopHeadlines("technology", "en", "10", Constants.API_KEY);
+            getTopHeadlines(Constants.CATEGORY, Constants.LANGUAGE, Constants.COUNTRY, Constants.MAX_HEADLINES, Constants.API_KEY);
         }
     }
 
-    private void getTopHeadlines(String category, String language, String maxHeadlines, String apiKey) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        getNews();
+    }
+
+    private void getTopHeadlines(String category, String language, String country, String maxHeadlines, String apiKey) {
 
         topHeadlinesViewModel.getIsLoading().observe(this, aBoolean -> {
             if (aBoolean) {
@@ -110,7 +124,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             }
         });
 
-        topHeadlinesViewModel.getTopHeadlines(category, language, maxHeadlines, apiKey).observe(this, topHeadlines -> {
+        topHeadlinesViewModel.getTopHeadlines(category, language, country, maxHeadlines, apiKey).observe(this, topHeadlines -> {
             if (topHeadlines != null) {
                 displayHeadlines(topHeadlines);
             } else {
@@ -123,6 +137,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
     private void getSearchedNews(
             String searchKeyword,
             String lang,
+            String country,
             String max,
             String apikey
     ) {
@@ -135,7 +150,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             }
         });
 
-        topHeadlinesViewModel.getSearchedNews(searchKeyword, lang, max, apikey).observe(this, topHeadlines -> {
+        topHeadlinesViewModel.getSearchedNews(searchKeyword, lang, country, max, apikey).observe(this, topHeadlines -> {
             if (topHeadlines != null) {
                 displayHeadlines(topHeadlines);
             } else {
@@ -150,6 +165,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
         newsRecyclerView.setAdapter(newsRecyclerViewAdapter);
         newsRecyclerViewAdapter.setOnNewsClickListener(this);
         newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
+        newsRecyclerViewAdapter.setBookmarkExitsListener(this);
         newsRecyclerViewAdapter.notifyDataSetChanged();
     }
 
@@ -174,4 +190,16 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             }
         });
     }
+
+    @Override
+    public void isBookmarked(Article article, ImageView bookmarkImageView) {
+        bookmarkViewModel.isBookmarkExits(article).observe(requireActivity(), integer -> {
+            if (integer == 0) {
+                bookmarkImageView.setImageResource(R.drawable.baseline_bookmark_border_24);
+            } else if (integer > 0) {
+                bookmarkImageView.setImageResource(R.drawable.baseline_bookmark_24);
+            }
+        });
+    }
+
 }

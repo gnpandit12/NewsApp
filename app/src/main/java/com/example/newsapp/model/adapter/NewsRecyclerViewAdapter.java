@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.newsapp.R;
 import com.example.newsapp.model.data.Article;
+import com.example.newsapp.model.listener.BookmarkExitsListener;
 import com.example.newsapp.model.listener.OnBookmarkClickedListener;
 import com.example.newsapp.model.listener.OnHeadlineClickListener;
 
@@ -29,6 +30,7 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     private ArrayList<Article> mArticleArrayList;
     private OnHeadlineClickListener mOnHeadlineClickListener;
     private OnBookmarkClickedListener mOnBookmarkClickedListener;
+    private BookmarkExitsListener mBookmarkExitsListener;
     public NewsRecyclerViewAdapter(Context context, ArrayList<Article> articleArrayList) {
         this.mContext = context;
         this.mArticleArrayList = articleArrayList;
@@ -55,9 +57,9 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
         holder.itemView.setOnClickListener(view -> mOnHeadlineClickListener.onNewsClicked(article));
 
-        holder.bookmarkImageview.setOnClickListener(view -> {
-            mOnBookmarkClickedListener.onBookmarkClicked(article, article.getTitle(), article.getContent(), article.getDescription(), holder.bookmarkImageview);
-        });
+        holder.bookmarkImageview.setOnClickListener(view -> mOnBookmarkClickedListener.onBookmarkClicked(article, article.getTitle(), article.getContent(), article.getDescription(), holder.bookmarkImageview));
+
+        mBookmarkExitsListener.isBookmarked(article, holder.bookmarkImageview);
 
     }
 
@@ -89,6 +91,10 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     public void setOnBookmarkClickedListener(OnBookmarkClickedListener onBookmarkClickedListener) {
         this.mOnBookmarkClickedListener = onBookmarkClickedListener;
+    }
+
+    public void setBookmarkExitsListener(BookmarkExitsListener bookmarkExitsListener) {
+        this.mBookmarkExitsListener = bookmarkExitsListener;
     }
 
 }

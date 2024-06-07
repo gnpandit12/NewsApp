@@ -16,6 +16,7 @@ public interface ApiInterface {
     Call<TopHeadlines> getTopHeadlines(
             @Query("category") String category,
             @Query("lang") String lang,
+            @Query("country") String country,
             @Query("max") String max,
             @Query("apikey") String apikey
     );
@@ -24,6 +25,7 @@ public interface ApiInterface {
     Call<TopHeadlines> getSearchedHeadlines(
             @Query("q") String searchKeyword,
             @Query("lang") String lang,
+            @Query("country") String country,
             @Query("max") String max,
             @Query("apikey") String apikey
     );

@@ -28,12 +28,14 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
     public MutableLiveData<TopHeadlines> getTopHeadlines(
             String category,
             String language,
+            String country,
             String maxHeadlines,
             String apiKey
     ) {
         topHeadlinesMutableLiveData = getTopHeadlinesMutableLiveData(
                 category,
                 language,
+                country,
                 maxHeadlines,
                 apiKey);
         return topHeadlinesMutableLiveData;
@@ -41,12 +43,14 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
     private MutableLiveData<TopHeadlines> getTopHeadlinesMutableLiveData(
             String category,
             String language,
+            String country,
             String maxHeadlines,
             String apiKey
     ) {
         return headlinesRepository.getTopHeadlinesResponse(
                 category,
                 language,
+                country,
                 maxHeadlines,
                 apiKey
         );
@@ -64,12 +68,14 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
     public MutableLiveData<TopHeadlines> getSearchedNews(
             String searchKeyword,
             String lang,
+            String country,
             String max,
             String apikey
     ) {
         searchedNewsMutableLiveData = getSearchedNewsMutableLiveData(
                 searchKeyword,
                 lang,
+                country,
                 max,
                 apikey);
         return searchedNewsMutableLiveData;
@@ -77,12 +83,14 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
     private MutableLiveData<TopHeadlines> getSearchedNewsMutableLiveData(
             String searchKeyword,
             String lang,
+            String country,
             String max,
             String apikey
     ) {
         return headlinesRepository.getSearchedNewsResponse(
                 searchKeyword,
                 lang,
+                country,
                 max,
                 apikey
         );
