@@ -30,8 +30,8 @@ public interface BookmarkDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateArticle(Article articles);
 
-    @Delete
-    void deleteArticle(Article articles);
+    @Query("DELETE FROM Article WHERE title =:title ")
+    void deleteArticle(String title);
 
     @Query("SELECT COUNT() FROM Article WHERE title =:title and content =:content and description =:description")
     int isArticleExists(String title, String content, String description);

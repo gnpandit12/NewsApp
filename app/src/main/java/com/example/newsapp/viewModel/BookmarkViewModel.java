@@ -26,6 +26,7 @@ public class BookmarkViewModel extends AndroidViewModel {
 
         bookmarkRepository = new BookmarkRepository(application);
         articleListLiveData = bookmarkRepository.getAllBookmarks();
+
     }
 
     public LiveData<List<Article>> getAllBookmarksList() {
@@ -40,8 +41,8 @@ public class BookmarkViewModel extends AndroidViewModel {
         AsyncTask.execute(() -> bookmarkRepository.updateArticle(article));
     }
 
-    public void deleteArticle(Article article) {
-        AsyncTask.execute(() -> bookmarkRepository.deleteArticle(article));
+    public void deleteArticle(String title) {
+        AsyncTask.execute(() -> bookmarkRepository.deleteArticle(title));
     }
 
     public LiveData<Integer> isBookmarkExits(Article article) {

@@ -64,24 +64,18 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
     }
 
     private void getBookmarks() {
-        bookmarkViewModel.getAllBookmarksList().observe(this, articles -> {
+        bookmarkViewModel.getAllBookmarksList().observe(requireActivity(), articles -> {
             if (!articles.isEmpty()) {
                 newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) articles);
                 bookmarksRecyclerView.setAdapter(newsRecyclerViewAdapter);
-                newsRecyclerViewAdapter.notifyDataSetChanged();
                 newsRecyclerViewAdapter.setOnNewsClickListener(this);
                 newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
                 progressBar.setVisibility(View.INVISIBLE);
+                newsRecyclerViewAdapter.notifyDataSetChanged();
             } else {
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getBookmarks();
     }
 
     @Override
@@ -93,6 +87,6 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
 
     @Override
     public void onBookmarkClicked(Article article, String title, String content, String description, ImageView bookmarkImageView) {
-        bookmarkViewModel.deleteArticle(article);
+        bookmarkViewModel.deleteArticle(title);
     }
 }

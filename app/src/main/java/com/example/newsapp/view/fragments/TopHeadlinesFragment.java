@@ -148,9 +148,9 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
     private void displayHeadlines(TopHeadlines topHeadlines) {
         newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) topHeadlines.getArticles());
         newsRecyclerView.setAdapter(newsRecyclerViewAdapter);
-        newsRecyclerViewAdapter.notifyDataSetChanged();
         newsRecyclerViewAdapter.setOnNewsClickListener(this);
         newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
+        newsRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -169,8 +169,8 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
                 bookmarkImageView.setImageResource(R.drawable.baseline_bookmark_24);
             } else if (integer > 0) {
                 // Remove bookmark
+                bookmarkViewModel.deleteArticle(title);
                 bookmarkImageView.setImageResource(R.drawable.baseline_bookmark_border_24);
-                bookmarkViewModel.deleteArticle(article);
             }
         });
     }

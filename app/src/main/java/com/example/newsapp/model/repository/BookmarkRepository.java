@@ -41,8 +41,8 @@ public class BookmarkRepository {
         bookmarkDao.updateArticle(article);
     }
 
-    public void deleteArticle(Article article) {
-        bookmarkDao.deleteArticle(article);
+    public void deleteArticle(String title) {
+        bookmarkDao.deleteArticle(title);
     }
 
     public LiveData<Integer> isBookmarkExits(Article article) {
