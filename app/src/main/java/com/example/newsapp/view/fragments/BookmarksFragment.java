@@ -1,8 +1,10 @@
 package com.example.newsapp.view.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -46,7 +48,7 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentBookmarkBinding = FragmentBookmarkBinding.inflate(inflater,container,false);
         return fragmentBookmarkBinding.getRoot();
@@ -64,6 +66,7 @@ public class BookmarksFragment extends Fragment implements OnHeadlineClickListen
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void getBookmarks() {
         bookmarkViewModel.getAllBookmarksList().observe(requireActivity(), articles -> {
             newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) articles);

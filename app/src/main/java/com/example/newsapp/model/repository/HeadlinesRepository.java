@@ -1,5 +1,6 @@
 package com.example.newsapp.model.repository;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.newsapp.model.data.TopHeadlines;
@@ -18,10 +19,10 @@ public class HeadlinesRepository {
 
     private static ApiInterface apiInterface;
     private final MutableLiveData<TopHeadlines> topHeadlinesMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-    private MutableLiveData<TopHeadlines> searchedNewsMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private final MutableLiveData<TopHeadlines> searchedNewsMutableLiveData = new MutableLiveData<>();
     private static HeadlinesRepository headlinesRepository;
-    public static HeadlinesRepository getInstance(){
+    public static HeadlinesRepository getInstance() {
         if (headlinesRepository == null){
             headlinesRepository = new HeadlinesRepository();
         }
@@ -50,13 +51,13 @@ public class HeadlinesRepository {
 
         topHeadlinesCall.enqueue(new Callback<TopHeadlines>() {
             @Override
-            public void onResponse(Call<TopHeadlines> call, Response<TopHeadlines> response) {
+            public void onResponse(@NonNull Call<TopHeadlines> call, @NonNull Response<TopHeadlines> response) {
                 topHeadlinesMutableLiveData.setValue(response.body());
                 isLoading.setValue(false);
             }
 
             @Override
-            public void onFailure(Call<TopHeadlines> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<TopHeadlines> call, @NonNull Throwable throwable) {
                 topHeadlinesMutableLiveData.setValue(null);
             }
         });
@@ -86,13 +87,13 @@ public class HeadlinesRepository {
 
         topHeadlinesCall.enqueue(new Callback<TopHeadlines>() {
             @Override
-            public void onResponse(Call<TopHeadlines> call, Response<TopHeadlines> response) {
+            public void onResponse(@NonNull Call<TopHeadlines> call, @NonNull Response<TopHeadlines> response) {
                 searchedNewsMutableLiveData.setValue(response.body());
                 isLoading.setValue(false);
             }
 
             @Override
-            public void onFailure(Call<TopHeadlines> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<TopHeadlines> call, @NonNull Throwable throwable) {
                 searchedNewsMutableLiveData.setValue(null);
             }
         });

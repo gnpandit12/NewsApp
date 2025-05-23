@@ -15,14 +15,11 @@ import com.example.newsapp.model.repository.HeadlinesRepository;
  **/
 public class TopHeadlinesViewModel extends AndroidViewModel {
 
-    private HeadlinesRepository headlinesRepository;
-    private MutableLiveData<TopHeadlines> topHeadlinesMutableLiveData = new MutableLiveData<>();
+    private final HeadlinesRepository headlinesRepository;
 
-    private MutableLiveData<TopHeadlines> searchedNewsMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     public TopHeadlinesViewModel(@NonNull Application application) {
         super(application);
-        headlinesRepository = new HeadlinesRepository();
+        headlinesRepository = HeadlinesRepository.getInstance();
     }
 
     public MutableLiveData<TopHeadlines> getTopHeadlines(
@@ -32,14 +29,15 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
             String maxHeadlines,
             String apiKey
     ) {
-        topHeadlinesMutableLiveData = getTopHeadlinesMutableLiveData(
+        return headlinesRepository.getTopHeadlinesResponse(
                 category,
                 language,
                 country,
                 maxHeadlines,
-                apiKey);
-        return topHeadlinesMutableLiveData;
+                apiKey
+        );
     }
+/*
     private MutableLiveData<TopHeadlines> getTopHeadlinesMutableLiveData(
             String category,
             String language,
@@ -55,15 +53,18 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
                 apiKey
         );
     }
+*/
 
 
     public MutableLiveData<Boolean> getIsLoading() {
-        isLoading = getIsLoadingResponse();
-        return isLoading;
+        return headlinesRepository.getIsLoading();
     }
+
+/*
     private MutableLiveData<Boolean> getIsLoadingResponse() {
         return headlinesRepository.getIsLoading();
     }
+*/
 
     public MutableLiveData<TopHeadlines> getSearchedNews(
             String searchKeyword,
@@ -72,14 +73,17 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
             String max,
             String apikey
     ) {
-        searchedNewsMutableLiveData = getSearchedNewsMutableLiveData(
+        return headlinesRepository.getSearchedNewsResponse(
                 searchKeyword,
                 lang,
                 country,
                 max,
-                apikey);
-        return searchedNewsMutableLiveData;
+                apikey
+        );
     }
+
+
+/*
     private MutableLiveData<TopHeadlines> getSearchedNewsMutableLiveData(
             String searchKeyword,
             String lang,
@@ -95,4 +99,6 @@ public class TopHeadlinesViewModel extends AndroidViewModel {
                 apikey
         );
     }
+*/
+
 }

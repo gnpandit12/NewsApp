@@ -48,6 +48,7 @@
         android:id="@+id/news_image_view"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:layout_marginBottom="10dp"/>
 

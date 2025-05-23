@@ -1,5 +1,6 @@
 package com.example.newsapp.view.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,10 +11,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,20 +31,16 @@ import com.example.newsapp.viewModel.BookmarkViewModel;
 import com.example.newsapp.viewModel.TopHeadlinesViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 
 public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickListener, OnBookmarkClickedListener, BookmarkExitsListener {
 
+    public static final String TAG = "TopHeadlinesFragment";
     private FragmentTopHeadlinesBinding fragmentTopHeadlinesBinding;
-    private TopHeadlinesViewModel topHeadlinesViewModel;
-
     private RecyclerView newsRecyclerView;
-    private NewsRecyclerViewAdapter newsRecyclerViewAdapter;
     private ProgressBar progressBar;
     private EditText searchEditText;
-    public static final String TAG = "TopHeadlinesFragment";
+    private TopHeadlinesViewModel topHeadlinesViewModel;
     private BookmarkViewModel bookmarkViewModel;
 
     @Override
@@ -57,7 +53,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         fragmentTopHeadlinesBinding = FragmentTopHeadlinesBinding.inflate(inflater, container, false);
@@ -77,11 +73,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             if (i == EditorInfo.IME_ACTION_DONE) {
                 if (!searchEditText.getText().toString().trim().isEmpty()) {
                     getSearchedNews(
-                            searchEditText.getText().toString().trim(),
-                            Constants.LANGUAGE,
-                            Constants.COUNTRY,
-                            Constants.MAX_HEADLINES,
-                            Constants.API_KEY
+                            searchEditText.getText().toString().trim()
                     );
                 } else {
                     Log.d(TAG, "Search null");
@@ -97,14 +89,10 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
     private void getNews() {
         if (!searchEditText.getText().toString().trim().isEmpty()) {
             getSearchedNews(
-                    searchEditText.getText().toString().trim(),
-                    Constants.LANGUAGE,
-                    Constants.COUNTRY,
-                    Constants.MAX_HEADLINES,
-                    Constants.API_KEY
+                    searchEditText.getText().toString().trim()
             );
         } else {
-            getTopHeadlines(Constants.CATEGORY, Constants.LANGUAGE, Constants.COUNTRY, Constants.MAX_HEADLINES, Constants.API_KEY);
+            getTopHeadlines();
         }
     }
 
@@ -114,7 +102,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
         getNews();
     }
 
-    private void getTopHeadlines(String category, String language, String country, String maxHeadlines, String apiKey) {
+    private void getTopHeadlines() {
 
         topHeadlinesViewModel.getIsLoading().observe(this, aBoolean -> {
             if (aBoolean) {
@@ -124,7 +112,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             }
         });
 
-        topHeadlinesViewModel.getTopHeadlines(category, language, country, maxHeadlines, apiKey).observe(this, topHeadlines -> {
+        topHeadlinesViewModel.getTopHeadlines(Constants.CATEGORY, Constants.LANGUAGE, Constants.COUNTRY, Constants.MAX_HEADLINES, Constants.API_KEY).observe(this, topHeadlines -> {
             if (topHeadlines != null) {
                 displayHeadlines(topHeadlines);
             } else {
@@ -134,13 +122,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
 
     }
 
-    private void getSearchedNews(
-            String searchKeyword,
-            String lang,
-            String country,
-            String max,
-            String apikey
-    ) {
+    private void getSearchedNews(String searchKeyword) {
 
         topHeadlinesViewModel.getIsLoading().observe(this, aBoolean -> {
             if (aBoolean) {
@@ -150,7 +132,7 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
             }
         });
 
-        topHeadlinesViewModel.getSearchedNews(searchKeyword, lang, country, max, apikey).observe(this, topHeadlines -> {
+        topHeadlinesViewModel.getSearchedNews(searchKeyword, Constants.LANGUAGE, Constants.COUNTRY, Constants.MAX_HEADLINES, Constants.API_KEY).observe(this, topHeadlines -> {
             if (topHeadlines != null) {
                 displayHeadlines(topHeadlines);
             } else {
@@ -160,8 +142,9 @@ public class TopHeadlinesFragment extends Fragment implements OnHeadlineClickLis
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void displayHeadlines(TopHeadlines topHeadlines) {
-        newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) topHeadlines.getArticles());
+        NewsRecyclerViewAdapter newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(getContext(), (ArrayList<Article>) topHeadlines.getArticles());
         newsRecyclerView.setAdapter(newsRecyclerViewAdapter);
         newsRecyclerViewAdapter.setOnNewsClickListener(this);
         newsRecyclerViewAdapter.setOnBookmarkClickedListener(this);
